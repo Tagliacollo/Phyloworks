@@ -59,3 +59,37 @@ plot_biogeo = function (phy_nwk, dat_csv) {
     dev.off()
     return (list(phy_nwk, dat_csv))
 }
+
+#Function to get best model of discrete character evolution
+eval_fitDiscrete_models = function (phy_nwk, dat_csv, numcol = 1){
+  
+  dat_vector = as.factor(dat_csv[, numcol]) 
+  names(dat_vector) = row.names(dat_csv)
+  
+  model_choices = c('ER', 'SYM', 'ARD')
+    
+  fit_model = list()
+  for (i in 1:3) {
+    fit = fitDiscrete(phy_nwk, dat_vector, model = model_choices[i])
+    fit_model[[model_choices[i]]] = fit
+  }
+  
+  #csv table
+  lnL      = c(fit_model$ER$opt$lnL, fit_model$SYM$opt$lnL, fit_model$ARD$opt$lnL)
+  aicc     = c(fit_model$ER$opt$aicc, fit_model$SYM$opt$aicc, fit_model$ARD$opt$aicc)
+  del_aicc = c(aicw(aicc)$delta)
+  wts_aicc = c(aicw(aicc)$w)
+  
+  output_csv = matrix( , 3, 4, dimnames=list(c("ER", "SYM", "ARD"),
+                                             c("lnL", "AICc", "delta AICc", "AICc weights")))
+  output_csv[,1] = lnL  
+  output_csv[,2] = aicc
+  output_csv[,3] = del_aicc
+  output_csv[,4] = wts_aicc
+  
+  write.csv(output_csv, file = 'model_selection.csv')
+  
+  best_fitted_model = fit_model[which.min(aicc)]
+  
+  return (list(best_fitted_model, dat_vector))
+}
