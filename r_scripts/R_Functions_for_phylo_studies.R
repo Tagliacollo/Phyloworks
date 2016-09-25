@@ -93,3 +93,20 @@ eval_fitDiscrete_models = function (phy_nwk, dat_csv, numcol = 1){
   
   return (list(best_fitted_model, dat_vector))
 }
+
+# Fuction to make simmaps and plot 1st simmap result
+plot_simmmap_pdf = function (phy_nwk, dat_vector, model, nsim = 100){
+  mtrees = make.simmap(phy_nwk, dat_vector, model, nsim)
+  stoch_map = describe.simmap(mtrees, plot=FALSE)
+  
+  cols = setNames(palette()[1:length(unique(dat_vector))], sort(unique(dat_vector)))
+
+  pdf('Simmap.pdf', width=8, height=10, paper = 'a4')
+  plotSimmap(mtrees[[1]], cols, fsize=0.5, ftype="i")
+  
+  nodelabels(pie=stoch_map$ace, piecol=cols, cex=0.5)
+  add.simmap.legend(colors=cols, prompt=FALSE, 
+                    x=0.9*par()$usr[1], y=12) # TODO: improve the code for the axis
+  dev.off()
+  return (list(mtrees, stoch_map))
+}
