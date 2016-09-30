@@ -25,6 +25,8 @@ dat.csv = clean[[2]]
 output = '/Volumes/VATagliacollo/GitHub/Phyloworks/plots/random_phylomorphoscape'
 pw_plot_Phylomorphospace(phy, dat.csv, anc.estimates=FALSE, pdf.name=output)
 
+output = '/Volumes/VATagliacollo/GitHub/Phyloworks/plots/random_phylomorphoscape1'
+pw_plot_Phylomorphospace(phy, dat.csv, anc.estimates=TRUE, pdf.name=output)
 
 # clean up data BiogeoAreas 
 clean = pw_Cleanup_data(phy, areas.csv)
