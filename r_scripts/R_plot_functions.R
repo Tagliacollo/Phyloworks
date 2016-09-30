@@ -39,17 +39,11 @@ pw_plot_Phylomorphospace = function(phy, dat.csv, anc.estimates = FALSE,
   
   # Vectors
   vec.discrete   = as.factor(dat.csv[,1]);  names(vec.discrete)   = row.names(dat.csv) 
-  vec.continuous = dat.csv[,2:3];           # names(vec.continuous) = row.names(dat.csv) 
+  vec.continuous = dat.csv[,2:3];           # colnames(vec.continuous) = colnames(dat.csv) 
   
   # Plot parameters
   cols = setNames(rainbow(nlevels(vec.discrete), alpha = 1.0)
                   [1:length(unique(vec.discrete))], sort(unique(vec.discrete)))
-  
-  if (levels(vec.discrete) == names(cols)){
-    levels(vec.discrete) = cols
-  } else {
-    stop('levels of the discrete characters must match to the names of assigned colors')
-  }
   
   col.tips = as.character(vec.discrete);   names(col.tips) <- phy$tip.label
   
@@ -63,8 +57,8 @@ pw_plot_Phylomorphospace = function(phy, dat.csv, anc.estimates = FALSE,
   legend("topleft", legend=names(cols), col=cols, fill = cols, bty = 'n')
          
   if (anc.estimates == TRUE) {
-    lik.anc = anc.estimates[[5]] # TODO - Fix this
-    nodelabels(pie=lik.anc, piecol=cols, cex=0.6)
+    lik.anc = ace(col.tips, phy, type="discrete", model="ER")
+    nodelabels(pie=lik.anc$lik.anc, piecol=cols, cex=0.6)
   }
   dev.off()
   
