@@ -57,6 +57,7 @@ pw_plot_Phylomorphospace = function(phy, dat.csv, anc.estimates = FALSE,
   legend("topleft", legend=names(cols), col=cols, fill = cols, bty = 'n')
          
   if (anc.estimates == TRUE) {
+    # from: http://blog.phytools.org/2015/08/adding-node-labels-to-phylomorphospace.html
     lik.anc = ace(col.tips, phy, type="discrete", model="ER")
     nodelabels(pie=lik.anc$lik.anc, piecol=cols, cex=0.6)
   }
