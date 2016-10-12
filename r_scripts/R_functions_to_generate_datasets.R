@@ -202,8 +202,8 @@ regCoordinates = function(N = 50, sample = 100){
   lat = theta * 180/pi - 90
   lon = phi * 180/pi
   
-  lat_sample = sample(lat, sample, replace = F)
-  log_sample = sample(lon, sample, replace = F)
+  lat_sample = round(sample(lat, sample, replace = F), digits=1) 
+  log_sample = round(sample(lon, sample, replace = F), digits=1)
   
   # Data frame
   DF = data.frame(id  = paste0("ID.", 1:sample),
@@ -214,3 +214,4 @@ regCoordinates = function(N = 50, sample = 100){
                   
   return(DF)
 }
+
