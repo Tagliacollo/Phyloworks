@@ -6,6 +6,7 @@ is.installed = function(pkg){
   # 
   # Arg: 
   #   pkg: package name
+  # Return: NULL. Ps: named package is installed case it isn't in the system
   is.element(pkg, installed.packages()[,1])
 } 
 
@@ -61,7 +62,9 @@ NAinsert <- function(df, prop=0.1){
   # Args:
   #  df: dataframe of any kind of data
   #  prop: proportion of NA values to be inserted into the data frame     
-
+  # Returns:
+  #   same input data frame but if random 'NaNs' added to it
+  
   # Error handling
 	if (is.data.frame(df) == FALSE) stop("df must be a data frame") 
 
@@ -95,7 +98,11 @@ DFmaker <- function(n=10, type=wide, digits=2, na.rate=0.0){
   #   na.rate: (a decimal value between 0 and 1; default is 0) that randomly inserts missing data 
   #             great for teaching demos and testing corner cases
   #             PS: To work, it requires loading the function NAinsert
-
+  # Return:
+  #   data frame with the following col: id, group, hs.grad, race, gender, age, m.status,
+  #                                      political, n.kids, income, score, time1, time2, 
+  #                                      time3 (time are cumulative sums)
+  
     rownamer = function(dataframe){
                   x = as.data.frame(dataframe)
                   rownames(x) <- NULL
@@ -149,21 +156,27 @@ DFmaker <- function(n=10, type=wide, digits=2, na.rate=0.0){
 }
 
 
-regularCoordinates = function(N = 50, sample = 100){
+regCoordinates = function(N = 50, sample = 100){
   # Function from Package ‘geosphere’ 
   #      docs at: https://cran.r-project.org/web/packages/geosphere/geosphere.pdf
-  #      one change: add function 'sample' to get a sample of GPS coords
+  #       change: add function 'sample' to get a sample of GPS coords
+  #             : add paste0 to include id names
+  #             : add data.frame to create a data frame
   # Args:
   #   N: Number of ’parts’ in which the earth is subdived
   #   sample: number of samples to be drawn 
-  #
+  # Return:
+  #   data frame with the follwing cols: ID, log, lat, group  
+  
   N = round(N)
+  sample = round(sample)
   
   # Error handling 
-  if (N < 1) {
-    stop("N should be >= 1")
+  if (N < 1 | sample < 3) {
+    stop("N should be >= 1 and n should be >= 3")
   }
   
+  # Random GPS coords
   beta = 0.5 * pi/N
   A = 2 * sin(beta/2)
   points = rbind(c(0, 0, 1), c(0, 0, -1))
@@ -192,5 +205,12 @@ regularCoordinates = function(N = 50, sample = 100){
   lat_sample = sample(lat, sample, replace = F)
   log_sample = sample(lon, sample, replace = F)
   
-  return(cbind(log_sample, lat_sample))
+  # Data frame
+  DF = data.frame(id  = paste0("ID.", 1:sample),
+                  log = log_sample,
+                  lat = lat_sample,
+                  groups = sample(c("A", "B", "C"), sample, replace = TRUE)
+                  )
+                  
+  return(DF)
 }
