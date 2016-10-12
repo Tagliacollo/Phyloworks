@@ -18,7 +18,8 @@ rescale_phy = function(phy, scale = 1, ladderize = TRUE) {
 
 # Function to compare phylo vs dataset and clean up missing data
 pw_Cleanup_data = function(phy, dat.csv) {
-  
+  # please check also 'treedata' function in Geiger
+  # I didn't know it exists before writing this function
   dat.csv <- dat.csv[phy$tip.label,]
   
   if (rownames(dat.csv) == phy$tip.label) {
