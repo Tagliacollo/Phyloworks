@@ -37,7 +37,7 @@ props = function(ncol, nrow, var.names=NULL){
                 			y = y + x
                 			
                 			return(x)
-               				}
+               			}
                		)
 
         w = c(z , 1-sum(z))
@@ -215,3 +215,43 @@ regCoordinates = function(N = 50, sample = 100){
   return(DF)
 }
 
+makeDF.perm = function(N, N.groups = 2, bias = FALSE){
+  # Function to generate random dataset 
+  # 
+  # Arg: 
+  #   N = number of data points to be generated. default = 100
+  #   N.groups = number of distinct groups in the dataset. default = 2
+  #   bias = if set to TRUE, one of the groups show statistically sigf 'p value'
+  #          if set to FALSE, none of the groups show statistically sigf 'p value'
+  #   
+  # Return: 
+  #    data frame with ID names, grous, and N randomly and normally distributed measurements
+  #
+  
+  # Error handling 
+  if ((N%%1 != 0) | (N.groups > 27)) {
+    stop("inputs must be integers and/or N.groups should be smaller than 27")
+  }
+  
+  name.ID     = paste0('ID.', 1:N)
+  name.groups = sample(LETTERS[1:N.groups], N, replace = TRUE)
+  r.num = round(rnorm(N, mean = 0, sd = 1), digits = 3)
+  
+  if (bias == FALSE){
+    
+    return(data.frame(name = name.ID, groups = name.groups, measurements = r.num))
+    
+  }
+  
+  if (bias == TRUE) {
+    r.group = sample(name.groups, 1)
+    counts = sum(name.groups == r.group)  
+    r.bias = round(rnorm(counts, mean = 1.5, sd = 0.5), digits = 3) 
+    
+    df = data.frame(name = name.ID, groups = name.groups, measurements = r.num)
+    df[df$groups == r.group, 'measurements'] = r.bias
+    
+    return (df)
+    
+  }
+}
