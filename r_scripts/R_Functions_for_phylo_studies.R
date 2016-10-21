@@ -16,32 +16,28 @@ rescale_phy = function(phy, scale = 1, ladderize = TRUE) {
   } 
 }
 
+
 # Function to compare phylo vs dataset and clean up missing data
 pw_Cleanup_data = function(phy, dat.csv) {
   # please check also 'treedata' function in Geiger
   # I didn't know it exists before writing this function
-  dat.csv <- dat.csv[phy$tip.label,]
   
-  if (rownames(dat.csv) == phy$tip.label) {
-    } else {
-      
-      #add info about read.csv, rownames = TRUE
-      phyOnly <- setdiff(phy$tip.label, rownames(dat.csv))
-      datOnly <- setdiff(rownames(dat.csv), phy$tip.label)
-      
-      if (length(phyOnly) > 0) {
-        phy <- drop.tip(phy, phyOnly)
-        message("The following taxa were deleted from the tree: "); print(phyOnly)
-        }
-      
-      if (length(datOnly) > 0) {
-        dat.csv <- dat.csv[-match(datOnly, rownames(dat.csv)),]
-        message("The following taxa were deleted from the dataset: "); print(datOnly)
-        }
-      }
-  message('You are ready to proceed! see phy: [[1]], csv: [[2]]')
-  return (list(phy, dat.csv))
+  #add info about read.csv, rownames = TRUE
+  phyOnly <- setdiff(phy$tip.label, rownames(dat.csv))
+  datOnly <- setdiff(rownames(dat.csv), phy$tip.label)
+  
+  if (length(phyOnly) > 0) {
+    phy <- drop.tip(phy, phyOnly)
+    message("The following taxa were deleted from the tree: "); print(phyOnly)
   }
+  
+  if (length(datOnly) > 0) {
+    dat.csv <- dat.csv[-match(datOnly, rownames(dat.csv)),]
+    message("The following taxa were deleted from the dataset: "); print(datOnly)
+  }
+  message('You are ready to proceed! see phy: [[1]], csv: [[2]]')
+  return (list(phy = phy, dat = dat.csv))
+}
 
 #Function to get best model of discrete character evolution
 pw_fitDiscreteModels = function (phy, dat.csv, numcol = 1){
