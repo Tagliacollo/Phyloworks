@@ -1,15 +1,5 @@
 # Function to generate datasets
 
-is.installed = function(pkg){ 
-  # Function to check whether package is installed or needs to be installed
-  #   from: http://stackoverflow.com/questions/9341635/check-for-installed-packages-before-running-install-packages  
-  # 
-  # Arg: 
-  #   pkg: package name
-  # Return: NULL. Ps: named package is installed case it isn't in the system
-  is.element(pkg, installed.packages()[,1])
-} 
-
 props = function(ncol, nrow, var.names=NULL){
   # Function to generate random proportions whose rowSums = 1
   # 	from: https://www.r-bloggers.com/function-to-generate-a-random-data-set/
