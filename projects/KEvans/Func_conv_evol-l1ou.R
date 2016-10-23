@@ -1,15 +1,14 @@
-l1ou.models = function(phy, dat, criterion = 'AICc', name = 'l1ou_models.pdf'){
+l1ou.models = function(phy, dat, criterion = 'pBIC', name = 'l1ou_models.pdf'){
   
   dat.mtx = as.matrix(dat)
   dat.processed = adjust_data(phy, dat.mtx)
   
   # regimes
-  shift.model = estimate_shift_configuration(dat.processed$tree, dat.processed$Y)
+  shift.model = estimate_shift_configuration(dat.processed$tree, dat.processed$Y, 
+                                             criterion = criterion)
   conv.regimes = estimate_convergent_regimes(shift.model, criterion = criterion)
   
-  return(shift.model = shift.model, conv.regimes = conv.regimes)
-  
-  models.l1ou = list(shift.model, conv.regimes)
+  models.l1ou = list(shift.model,conv.regimes)
   
   # save pdf
   pdf(name, width=8, height=11)
@@ -17,7 +16,6 @@ l1ou.models = function(phy, dat, criterion = 'AICc', name = 'l1ou_models.pdf'){
   # plot regimes
   for (model in models.l1ou) {
     plot(model, show.tip.label = FALSE,  asterisk = F, edge.ann.cex = 0.6)
-    
   }
   
   dev.off()
@@ -25,7 +23,9 @@ l1ou.models = function(phy, dat, criterion = 'AICc', name = 'l1ou_models.pdf'){
   cmdstr = paste("open ", name, sep="")
   system(cmdstr)
   
+  return (list(shift = shift.model, convegence = conv.regimes))
 }
+
 
 l1ou.bootstrap = function(shift.model, conv.regimes, n.bootstrap, name = 'l1ou_boots.pdf', 
                           multicore = FALSE, nCores = 2, quietly = TRUE ) {
@@ -35,7 +35,6 @@ l1ou.bootstrap = function(shift.model, conv.regimes, n.bootstrap, name = 'l1ou_b
   conv.model.boots = l1ou_bootstrap_support(conv.regimes, nItrs = n.bootstrap, 
                                             multicore, nCores, quietly)
   
-  return(shift.model.boots = shift.model.boots, conv.regimes.boots = conv.regimes.boots)
   
   res.l1ou.boots = list(shift.model.boots, conv.model.boots)
   models.l1ou = list(shift.model, conv.regimes)
@@ -59,4 +58,6 @@ l1ou.bootstrap = function(shift.model, conv.regimes, n.bootstrap, name = 'l1ou_b
   
   cmdstr = paste("open ", name, sep="")
   system(cmdstr)
+
+  return(list(shift.model.boots, conv.regimes.boots))
 }
