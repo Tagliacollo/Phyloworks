@@ -59,5 +59,5 @@ l1ou.bootstrap = function(shift.model, conv.regimes, n.bootstrap, name = 'l1ou_b
   cmdstr = paste("open ", name, sep="")
   system(cmdstr)
 
-  return(list(shift.model.boots, conv.regimes.boots))
+  return(list(shift.model.boots, conv.model.boots))
 }
