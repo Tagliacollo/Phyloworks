@@ -59,10 +59,20 @@ def gb_efetch_parse(efetch_to_be_parsed):
 
 	return(elements)
 
+def aln_seq_muscle(list_of_seqs_fasta):
 
+	seqs_fas = ';'.join(list_of_seqs_fasta)
 
+	muscle_cline = MuscleCommandline(clwstrict=True)
+	
+	child = subprocess.Popen(str(muscle_cline), stdin=subprocess.PIPE, stdout=subprocess.PIPE, 
+							 stderr=subprocess.PIPE, universal_newlines=True, 
+							 shell=(sys.platform!="win32"))
 
+	aln = SeqIO.write(seqs_fas, child.stdin, "fasta")
 
+	child.stdin.close()
 
+	return(aln)
 
 
