@@ -1,34 +1,22 @@
-# from get_species_ranks import *
 from Bio import Entrez
 from Bio import SeqIO, AlignIO
 from collections import defaultdict
-from Bio.Align.Applications import MuscleCommandline, MafftCommandline, ClustalOmegaCommandline
-import subprocess
-import sys
 
+def provides_species_get_unalign_fasta(species, gene, email, outfilename, batch, rank):
 
-def provides_species_get_align(species, gene, email, batch=500, program = 'muscle'):
-
-	efetch      = gb_efetch(species, gene, email, batch=500)
-	seqs_dict   = gb_efetch_parse(efetch)
+	efetch      = gb_efetch(species, gene, email, batch)
+	seqs_dict   = gb_efetch_parse(efetch, rank)
 	
-	align_multi_seqs  = defaultdict(list)
 
 	for key, value in seqs_dict.items():
 		seqs_dict_by_genus = defaultdict(list)
 		seqs_dict_by_genus[key] = value
 
-		fas_unalign = fasta_to_be_aln(seqs_dict_by_genus)
+		fas_unalign = fasta_to_be_aln(seqs_dict_by_genus, gene, outfilename)
 
-		if len(fas_unalign) < 2:
-			align_multi_seqs[key].append(fas_unalign)
-			
-		else:
-			align_multi_seqs[key].append(align_seq_cmd(fas_unalign, program))
+	return(fas_unalign)
 
-	return(align_multi_seqs)
-
-def gb_efetch(species, gene, email, batch=500):
+def gb_efetch(species, gene, email, batch):
 
 	try:
 		from urllib.error import HTTPError  # for Python 3
@@ -66,56 +54,30 @@ def gb_efetch(species, gene, email, batch=500):
 			else:
 				raise
 
+	print('...done\n')
+
 	return(handle_efetch)
 
-def gb_efetch_parse(efetch_to_be_parsed):
+def gb_efetch_parse(efetch_to_be_parsed, rank):
 	
 	elements = defaultdict(list)
 
 	for seqs in SeqIO.parse(efetch_to_be_parsed, 'gb'):
-		key = seqs.annotations['taxonomy'][-1]
-		value = (seqs.annotations['organism'], 
-				 seqs,
-				 seqs.annotations['taxonomy'])
+		key = seqs.annotations['taxonomy'][rank] # change number [-1] if we
+		value = (seqs.annotations['organism'], # want seqs for higher rank level (defaut = 'genus') 
+				 seqs)
 
 		elements[key].append(value)
 
 	return(elements)
 
-def fasta_to_be_aln(seqs_dict):
+def fasta_to_be_aln(seqs_dict, gene, outfilename):
 
 	seq_list = []
 	for key, value in seqs_dict.items():
 		for i, seq in enumerate(value):
 			seq_list.append(value[i][1])
 
-	return(tuple(seq_list))
-
-def align_seq_cmd(tuple_list, program = 'muscle'):
-
-	# **Important** - muscle and mafft must be installed in anaconda python. 
-	# To install muscle type on the command line: conda install -c tomkinsc muscle=3.8.31
-	# To install mafft type on the command line: conda install -c bioconda mafft=7.221
-	# To install clustalOmega on the command line: conda install -c etetoolkit argtable2=2.13
-
-
-
-	if program == 'muscle':
-		cline = MuscleCommandline(clwstrict=True)
-
-	if program == 'clustalOmega':
-		cline = ClustalOmegaCommandline(verbose=True, auto=True)
-
-	if program == 'mafft':
-		cline = MafftCommandline()
-
-	child = subprocess.Popen(str(cline), stdin=subprocess.PIPE, 
-							 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-							 universal_newlines=True, shell=(sys.platform!="win32"))
-
-	SeqIO.write(tuple_list, child.stdin, "fasta")
-	child.stdin.close()
-
-	align = AlignIO.read(child.stdout, "clustal")
-
-	return(align)
+	SeqIO.write(seq_list, '%s_%s.fasta' % (outfilename, gene), 'fasta')
+	
+	return (seq_list)
