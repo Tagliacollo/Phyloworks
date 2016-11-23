@@ -1,13 +1,13 @@
 import os
 from pathlib2 import Path
+from Bio.SeqUtils.CheckSum import seguid
+from Bio import SeqIO
 
 
-def output_path(cwd, folder_name):
+def output_path(cwd, folderpath):
 
     repo_dir = Path(cwd).parents[0]
-    seqs_dir = os.path.join(str(repo_dir), 
-                        "projects/VATagliacollo/phylo_of_gymn/sequences")
-    output_path = os.path.join(seqs_dir, folder_name)
+    output_path = os.path.join(str(repo_dir), folderpath) 
     
     if not os.path.exists(output_path):
         os.makedirs(output_path)
