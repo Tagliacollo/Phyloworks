@@ -2,17 +2,16 @@ from Bio import Entrez
 from Bio import SeqIO, AlignIO
 from collections import defaultdict
 
-def provides_species_get_unalign_fasta(species, gene, email, outfilename, batch, rank):
+def get_seqRecords(species, gene, email, batch, rank):
 
 	efetch      = gb_efetch(species, gene, email, batch)
 	seqs_dict   = gb_efetch_parse(efetch, rank)
-	
 
 	for key, value in seqs_dict.items():
 		seqs_dict_by_genus = defaultdict(list)
 		seqs_dict_by_genus[key] = value
 
-		fas_unalign = fasta_to_be_aln(seqs_dict_by_genus, gene, outfilename)
+		fas_unalign = fasta_to_be_aln(seqs_dict_by_genus, gene)
 
 	return(fas_unalign)
 
@@ -27,17 +26,13 @@ def gb_efetch(species, gene, email, batch):
 	name = '%s[Orgn] AND %s[Gene]' % (species, gene)
 
 	#part 1: esearch
-	handle_esearch = Entrez.esearch(db = 'nucleotide', term = name, retmax = 100000000)
-	esearch_read = Entrez.read(handle_esearch)
-	handle_esearch.close()
+	handle_esearch = Entrez.read(Entrez.esearch(db = 'nucleotide', term = name, retmax = 100000000))
 	
-	id_list = esearch_read['IdList']
-	count   = esearch_read['Count']
+	id_list = handle_esearch['IdList']
+	count   = handle_esearch['Count']
 
 	# Parte 2: epost
-	handle_epost = Entrez.epost(db = 'nucleotide', id=",".join(map(str,id_list)))
-	epost_read = Entrez.read(handle_epost)
-	handle_epost.close()
+	handle_epost = Entrez.read(Entrez.epost(db = 'nucleotide', id=",".join(map(str,id_list))))
 
 	# Parte 3: efetch
 	for start in range(0, int(count), batch):
@@ -46,7 +41,7 @@ def gb_efetch(species, gene, email, batch):
 
 		try:
 			handle_efetch = Entrez.efetch(db = "nucleotide", retmode = 'text', rettype = 'gb', 
-										  webenv = epost_read["WebEnv"], query_key = epost_read["QueryKey"])
+										  webenv = handle_epost["WebEnv"], query_key = handle_epost["QueryKey"])
 
 		except HTTPError as err:
 			if 500 <= err.code <= 599:
@@ -64,20 +59,18 @@ def gb_efetch_parse(efetch_to_be_parsed, rank):
 
 	for seqs in SeqIO.parse(efetch_to_be_parsed, 'gb'):
 		key = seqs.annotations['taxonomy'][rank] # change number [-1] if we
-		value = (seqs.annotations['organism'], # want seqs for higher rank level (defaut = 'genus') 
-				 seqs)
+		value = (seqs.annotations['organism'], # want seqs for 'genus' level) 
+				 	seqs)
 
 		elements[key].append(value)
 
 	return(elements)
 
-def fasta_to_be_aln(seqs_dict, gene, outfilename):
+def fasta_to_be_aln(seqs_dict, gene):
 
 	seq_list = []
 	for key, value in seqs_dict.items():
 		for i, seq in enumerate(value):
 			seq_list.append(value[i][1])
-
-	SeqIO.write(seq_list, '%s_%s.fasta' % (outfilename, gene), 'fasta')
 	
 	return (seq_list)
