@@ -1,3 +1,50 @@
+from os import listdir
+from os.path import isfile, join
+from Bio.Align.Applications import ClustalOmegaCommandline
+import os
+
+
+
+path = "/Volumes/VATagliacollo/GitHub/Phyloworks/projects/VATagliacollo/phylo_of_gymn/sequences/Gymnotiformes"
+
+fastas = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
+os.chdir('/Volumes/VATagliacollo/GitHub/Phyloworks/projects/VATagliacollo/phylo_of_gymn/sequences/Gymnotiformes')
+
+for fasta in fastas:
+	print(fasta)
+	muscle_cline = MuscleCommandline(input = fas, out= '%s.aln' % (fasta))
+
+
+def get_clustalo_aln(in_fas, out_fas)
+
+
+
+
+
+
+
+from subprocess import Popen, PIPE, STDOUT
+from Bio import SeqIO, AlignIO
+import sys
+
+# check this link to install to install argtable 2 and clustal: https://www.biostars.org/p/128261/
+# best anwser is given by Alex Reynolds
+# **Important** - muscle and mafft must be installed in anaconda python. 
+# To install muscle type on the command line: conda install -c tomkinsc muscle=3.8.31
+# To install mafft type on the command line: conda install -c bioconda mafft=7.221
+# To install clustalOmega on the command line: conda install -c etetoolkit argtable2=2.13
+
+records = (r for r in SeqIO.write("CYTB_Fritz.fas", "fasta") if len(r) < 900)
+
+cline = ['clustalo', '-', '--auto', '-v']
+
+proc = Popen(cline, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+
+stdout = proc.communicate(input=records)
+
+
+
 def align_seq_cmd(seq_list, program = 'muscle'):
 
 	# **Important** - muscle and mafft must be installed in anaconda python. 
@@ -35,28 +82,40 @@ def align_seq_cmd(seq_list, program = 'muscle'):
 	x = open('Apteronotus.fasta', 'r')
 	x.read()
 
+records = (r for r in SeqIO.parse("CYTB_Fritz.fas", "fasta") if len(r) < 900)
 
-	path ='/Users/Tagliacollo/anaconda/bin/muscle'
+cline   = ['muscle', '-quiet', '-maxiters', '1', '-diags']
 
-	cline = [path, '-quiet', '-maxiters', '1', '-diags']
+#cline = ClustalOmegaCommandline(infile=records, outfile=out_file, verbose=True, auto=True)
+#cline = ClustalOmegaCommandline(infile=records, outfile=out_file, verbose=True, auto=True)
 
-	#cline = ['muscle', '-quiet', '-maxiters', '1', '-diags']
+#cline = ['clustalo', '--auto', '-v']
 
-	child = sub.Popen(cline, stdin  = sub.PIPE, 
-							 stdout = sub.PIPE, 
-							 stderr = sub.PIPE,
-							 universal_newlines = True, 
-							 shell = (sys.platform!="win32"))
+child = Popen(cline, stdin = PIPE,
+					 stdout = PIPE,
+					 stderr = PIPE,
+					 universal_newlines = True) 
+
+SeqIO.write(records, child.stdin, "fasta")
+align = AlignIO.read(child.stdout, 'fasta')
 	
-	stdout, stderr = child.communicate()
-	
-	SeqIO.write(seq_list, child.stdin, "fasta")
-	
+stdin, stdout = child.communicate() 
+
+
 	child.stdin.close()
-
-	align = AlignIO.read(child.stdout, "clustal")
-
-	return(align)
+	child.stdout.close()
 
 
+import subprocess
+from Bio import AlignIO
 
+from Bio.Align.Applications import MuscleCommandline
+muscle_cline = MuscleCommandline(input="CYTB_Fritz.fas")
+child = subprocess.Popen(str(muscle_cline),
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          universal_newlines=True,
+                          shell=(sys.platform!="win32"))
+
+align = AlignIO.read(child.stdout, "fasta")
+print(align)
