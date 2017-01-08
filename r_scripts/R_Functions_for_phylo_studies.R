@@ -89,3 +89,16 @@ pw_plot_Simmmap = function (phy, dat_vector, model, nsim = 100){
   dev.off()
   return (list(mtrees, stoch_map))
 }
+
+
+
+# Function to plot bootstrap values as pie chart
+boots_pie_chart = function(phy, node.cex = 0.5, tip.cex = 0.5, label.offset = 0.5)
+  {
+  #From: http://blog.phytools.org/2016/02/adding-node-labels-including-bootstrap.html
+  plot.phylo(phy, label.offset = label.offset, cex = tip.cex)
+  nodelabels(node = 1:phy$Nnode + Ntip(phy),
+           pie = cbind(as.numeric(phy$node.label), 100-as.numeric(phy$node.label)),
+           piecol = c("black","white"), cex = node.cex)
+  }
+
