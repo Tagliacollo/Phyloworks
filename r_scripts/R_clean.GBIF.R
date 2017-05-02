@@ -1,5 +1,8 @@
 clean.GBIF <- function(DF, vars=c("bio1", "bio12")) 
 {
+
+  require(biogeo)
+
   DF <- addmainfields(DF, species="Species")
   checkdatastr(DF)
   
@@ -15,7 +18,7 @@ clean.GBIF <- function(DF, vars=c("bio1", "bio12"))
                          countryfield="NAME", vars=vars, res=10, 
                          elevc="elevation", diff=50)
 
-#  DF <- cleanup[cleanup$error!=1 & cleanup$dups!=1, ]
+# DF <- cleanup[cleanup$error!=1 & cleanup$dups!=1, ]
   DF <- cleanup[cleanup$dups!=1 & cleanup$wrongEnv!=1, ]
  
   return(DF[rowSums(is.na(DF)) != ncol(DF),])

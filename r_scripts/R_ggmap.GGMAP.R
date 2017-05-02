@@ -1,5 +1,7 @@
 ggmap.GGMAP <- function(DF) 
 {
+	require(ggmap)
+
 	DF <- data.frame(DF)
 	sp_name <- as.vector(DF$Species[1])
 
