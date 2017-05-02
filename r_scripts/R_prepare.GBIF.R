@@ -1,6 +1,8 @@
 prepare.GBIF <- function(DF)
 {
 
+  require(stringr)
+  
   # check ranges of lat and log 
   DF <- subset(DF, decimalLongitude >= -180 & decimalLongitude <= 180 &
                    decimalLatitude  >= -90  & decimalLatitude  <= 90 ) 
