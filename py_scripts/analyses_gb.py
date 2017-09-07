@@ -68,8 +68,5 @@ for sp in ssp_list:
 ################ ALIGNMENT
 
 
-
-
-
 ################ PHYLOGENY
 

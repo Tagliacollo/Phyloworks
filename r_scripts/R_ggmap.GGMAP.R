@@ -13,6 +13,6 @@ ggmap.GGMAP <- function(DF)
 		              crop=FALSE)
 	ggmap(myMap) +
 	geom_point(aes(x=DF$x, y=DF$y), data=DF,
-     	       alpha=0.6, color="darkred", size=3) +
+     	       alpha=0.6, color="darkred", size=1) +
 			   ggtitle(sp_name)
 }
